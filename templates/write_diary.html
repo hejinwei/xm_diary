@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+{% block css_files %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='assets/css/app.css') }}">
+{% endblock %}
+
+{% block js_files %}
+
+<script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='third_party/ueditor/js/ueditor.config.js') }}"></script>
+<script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='third_party/ueditor/js/editor_api.js') }}"></script>
+
+<script type="text/javascript">
+        UE.getEditor('myEditor',{
+            //这里可以选择自己需要的工具按钮名称,此处仅选择如下五个
+            //toolbars:[['FullScreen', 'Source', 'Undo', 'Redo','Bold','test']],
+            //focus时自动清空初始化时的内容
+            autoClearinitialContent:true,
+            //关闭字数统计
+            wordCount:false,
+            //关闭elementPath
+            elementPathEnabled:false,
+            //默认的编辑区域高度
+            initialFrameHeight:300,
+
+            // 上传请求地址:
+            serverUrl:"/upload"
+
+            //更多其他参数，请参考ueditor.config.js中的配置项
+        })
+
+        function save_diary() {
+            var ue = UE.getEditor('myEditor');
+            <!--alert("ue:" + ue);-->
+            <!--var content = ue.getContent();-->
+            <!--alert("content:" + content);-->
+            <!--var contentTxt = ue.getContentTxt();-->
+            <!--alert("contentText:"+contentTxt);-->
+
+            //alert($('#title').val());
+
+            $.post('/save_diary',{
+                user_id: {{ user_id }},
+                title: $('#title').val(),
+                weather: $('input[name="weather"]:checked').val(),
+                type: $('#type').val(),
+                content: ue.getContent()
+            }, function(data) {
+                if (data == 'ok') {
+                    window.location.href='/shouye';
+                } else {
+                    alert(data);
+                }
+
+            });
+        }
+
+
+</script>
+
+{% endblock %}
+
+{% block body %}
+<div class="am-cf am-padding">
+    <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">写日记</strong> /
+        <small></small>
+    </div>
+</div>
+
+<div class="am-g">
+    <label>标题:</label>
+    <input type="text" name="title" id="title">
+
+</div>
+
+<div class="am-g">
+    <label>天气:</label>
+    晴：
+    <input type="radio" checked="checked" name="weather" value="1" />
+    雨：
+    <input type="radio" name="weather" value="2" />
+</div>
+
+<div class="am-g">
+    类型:
+    <div class="am-u-sm-12 am-u-md-12">
+        <div class="am-form-group">
+            <select id="type" name="type" data-am-selected="{btnSize: 'sm'}">
+                <option value="1">舒服感情</option>
+                <option value="2">吐槽</option>
+                <option value="3">秀恩爱</option>
+            </select>
+        </div>
+   </div>
+</div>
+
+<div class="am-g">
+
+    <!--style给定宽度可以影响编辑器的最终宽度-->
+    <script type="text/plain" id="myEditor">
+
+    </script>
+
+
+    <button onclick="save_diary()">保存</button>
+
+</div>
+
+{% endblock %}
