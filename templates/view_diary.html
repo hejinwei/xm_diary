@@ -10,6 +10,9 @@
 <script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='third_party/ueditor/js/editor_api.js') }}"></script>
 
 <script type="text/javascript">
+
+
+
         UE.getEditor('myEditor',{
             //这里可以选择自己需要的工具按钮名称,此处仅选择如下五个
             //toolbars:[['FullScreen', 'Source', 'Undo', 'Redo','Bold','test']],
@@ -26,7 +29,7 @@
             serverUrl:"/upload",
 
             // 只读
-            readonly:true
+            readonly:{{ view_or_edit }} == 1
 
             //更多其他参数，请参考ueditor.config.js中的配置项
         })
@@ -37,7 +40,6 @@
             var ue = UE.getEditor('myEditor');
             ue.addListener("ready", function(){
                 ue.setContent('{{ diary.content|safe }}');
-                //ue.execCommand('insertHtml', "{{ diary.content }}");
             });
         });
 

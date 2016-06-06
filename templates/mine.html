@@ -6,17 +6,28 @@
 
 {% block js_files %}
 
-<script>
+<script type="text/javascript">
     function go_write_diary() {
         window.location.href='/go_write_diary/' + {{ user_id }};
     }
+
+    function go_edit_diary(diary_id) {
+        alert('edit');
+        window.location.href='/go_edit_diary/' + diary_id;
+    }
+
+    function delete_diary(diary_id) {
+        alert('delete');
+        window.location.href='/delete_diary/' + diary_id;
+    }
+
 </script>
 
 {% endblock %}
 
 {% block body %}
 <div class="am-cf am-padding">
-    <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">首页</strong> /
+    <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">我的</strong> /
         <small>日记列表</small>
     </div>
 </div>
@@ -35,13 +46,10 @@
     <div class="am-u-sm-12 am-u-md-3">
         <div class="am-form-group">
             <select data-am-selected="{btnSize: 'sm'}">
-                <option value="option1">所有类别</option>
-                <option value="option2">IT业界</option>
-                <option value="option3">数码产品</option>
-                <option value="option3">笔记本电脑</option>
-                <option value="option3">平板电脑</option>
-                <option value="option3">只能手机</option>
-                <option value="option3">超极本</option>
+                <option value="0">所有类别</option>
+                <option value="1">舒服感情</option>
+                <option value="2">吐槽</option>
+                <option value="3">秀恩爱</option>
             </select>
         </div>
     </div>
@@ -78,14 +86,14 @@
                     <td>
                         <div class="am-btn-toolbar">
                             <div class="am-btn-group am-btn-group-xs">
-                                <button class="am-btn am-btn-default am-btn-xs am-text-secondary"><span
-                                        class="am-icon-pencil-square-o"></span> 编辑
+                                <button type="button" onclick="go_edit_diary({{ diary.id }})" class="am-btn am-btn-default am-btn-xs am-text-secondary">
+                                    <span class="am-icon-pencil-square-o"></span> 编辑
                                 </button>
                                 <!--<button class="am-btn am-btn-default am-btn-xs am-hide-sm-only"><span
                                         class="am-icon-copy"></span> 复制-->
                                 </button>
-                                <button class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only"><span
-                                        class="am-icon-trash-o"></span> 删除
+                                <button type="button" onclick="delete_diary({{ diary.id }})" class="am-btn am-btn-default am-btn-xs am-text-danger am-hide-sm-only">
+                                    <span class="am-icon-trash-o"></span> 删除
                                 </button>
                             </div>
                         </div>

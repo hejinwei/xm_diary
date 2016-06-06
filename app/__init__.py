@@ -1,13 +1,14 @@
 # coding=utf-8
 
 from flask import Flask
-from views import login, index
+from views import login, mine, profile
 
 DEFAULT_APP_NAME = 'diary'
 
 DEFAULT_MODULES = (
     (login, ''),
-    (index, ''),
+    (mine, ''),
+    (profile, '')
     # (admin, '/admin'),
 )
 

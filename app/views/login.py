@@ -40,7 +40,7 @@ def do_login():
     session['user_id'] = user['user_id']
 
     # 跳转到首页
-    return redirect(url_for('index.show_diary_list', user_id=user['user_id'], page_num=1))
+    return redirect(url_for('mine.show_diary_list', user_id=user['user_id'], page_num=1))
 
 
 @login.route('/logout')

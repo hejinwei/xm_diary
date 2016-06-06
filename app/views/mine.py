@@ -11,32 +11,44 @@ from uploader import Uploader
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-index = Blueprint('index', __name__, static_folder='../static')
+mine = Blueprint('mine', __name__, static_folder='../static')
 
 default_page_size = 15
 
 UPLOAD_FOLDER = '/Users/jinweihe/Desktop/tmpFileUpload'
 
 
-@index.route('/show_diary_list/<user_id>/<int:page_num>')
+@mine.route('/show_diary_list/<user_id>/<int:page_num>')
 def show_diary_list(user_id, page_num):
     count = DiaryDao.find_diaries_count(user_id)
     diaries = DiaryDao.find_diaries(user_id, page_num, default_page_size)
-    return render_template('index.html', count=count, diaries=diaries, user_id=user_id)
+    return render_template('mine.html', count=count, diaries=diaries, user_id=user_id)
 
 
-@index.route('/view_diary/<diary_id>')
+@mine.route('/view_diary/<diary_id>')
 def view_diary(diary_id):
     diary = DiaryDao.find_diary_by_id(int(diary_id))
-    return render_template('view_diary.html', diary=diary)
+    return render_template('profile_detail.html', diary=diary)
 
 
-@index.route('/go_write_diary/<user_id>')
+@mine.route('/go_edit_diary/<diary_id>')
+def go_edit_diary(diary_id):
+    diary = DiaryDao.find_diary_by_id(int(diary_id))
+    return render_template('view_diary.html', diary=diary, view_or_edit=2)
+
+
+@mine.route('/go_write_diary/<user_id>')
 def go_write_diary(user_id):
     return render_template('write_diary.html', user_id=user_id)
 
 
-@index.route('/save_diary', methods=['post'])
+@mine.route('/delete_diary/<diary_id>')
+def delete_diary(diary_id):
+    DiaryDao.delete_diary_by_id(diary_id)
+    return None
+
+
+@mine.route('/save_diary', methods=['post'])
 def save_diary():
 
     ##验证用户
@@ -55,12 +67,17 @@ def save_diary():
     return 'ok'
 
 
-@index.route('/shouye')
-def shouye():
-    return redirect(url_for('index.show_diary_list', user_id=session['user_id'], page_num=1))
+@mine.route('/mine')
+def mine_index():
+    return redirect(url_for('mine.show_diary_list', user_id=session['user_id'], page_num=1))
 
 
-@index.route('/upload', methods=['GET', 'POST'])
+@mine.route('/profile/<user_id>')
+def profile(user_id):
+    return render_template('profile.html', user_id=user_id)
+
+
+@mine.route('/upload', methods=['GET', 'POST'])
 def upload():
 
     mimetype = 'application/json'

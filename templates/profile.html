@@ -1,0 +1,82 @@
+{% extends "profile_layout.html" %}
+{% block css_files %}
+
+{% endblock %}
+
+{% block js_files %}
+{% endblock %}
+
+{% block body %}
+
+<div class="am-cf am-padding">
+    <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">{{ owner.nickname }}</strong> /
+        <small>日记列表</small>
+    </div>
+</div>
+
+<div class="am-g">
+
+    <div class="am-u-sm-12 am-u-md-3">
+        <div class="am-form-group">
+            <select data-am-selected="{btnSize: 'sm'}">
+                <option value="0">所有类别</option>
+                <option value="1">舒服感情</option>
+                <option value="2">吐槽</option>
+                <option value="3">秀恩爱</option>
+            </select>
+        </div>
+    </div>
+    <div class="am-u-sm-12 am-u-md-3">
+        <div class="am-input-group am-input-group-sm">
+            <input type="text" class="am-form-field">
+          <span class="am-input-group-btn">
+            <button class="am-btn am-btn-default" type="button">搜索</button>
+          </span>
+        </div>
+    </div>
+</div>
+
+<div class="am-g">
+    <div class="am-u-sm-12">
+        <form class="am-form">
+            <table class="am-table am-table-striped am-table-hover table-main">
+                <thead>
+                <tr>
+                    <th class="table-title">标题</th>
+                    <th class="table-type">类别</th>
+                    <th class="table-type">天气</th>
+                    <th class="table-date am-hide-sm-only">时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for diary in diaries %}
+                <tr>
+                    <td><a href="/view_diary/{{ diary.id }}">{{ diary.title }}</a></td>
+                    <td>{{ diary.type }}</td>
+                    <td>{{ diary.weather }}</td>
+                    <td class="am-hide-sm-only">{{ diary.date }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="am-cf">
+                共 {{ total_count }} 条记录
+                <div class="am-fr">
+                    <ul class="am-pagination">
+                        <li {% if page_num < 2 %} class="am-disabled" {% endif %}>
+                            <a href="/profile/{{ owner.user_id }}/{{ page_num-1 }}">«</a>
+                        </li>
+                        <li class="am-active">第 {{ page_num }} 页</li>
+                        <li {% if total_pages <= page_num %} class="am-disabled" {% endif %}>
+                            <a href="/profile/{{ owner.user_id }}/{{ page_num+1 }}">»</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr/>
+            <p>我爱写日记...</p>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
