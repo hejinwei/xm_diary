@@ -37,6 +37,11 @@
         $(function(){
             $("input[name='weather'][value={{ diary.weather }}]").attr("checked",true);
             $("#type option[value={{ diary.type }}]").attr("selected", true);
+            $('input[name="private"][value={{ diary.private }}]').attr("checked",true);
+            $('#diary_password').val('{{ diary_password }}');
+            if ('{{ diary.private }}' == '2') {
+                $('#diary_password').attr('val', '{{ diary_password }}');
+            }
             var ue = UE.getEditor('myEditor');
             ue.addListener("ready", function(){
                 ue.setContent('{{ diary.content|safe }}');
@@ -59,11 +64,12 @@
                 return;
             }
 
-            $.post('/mine/save_diary',{
-                diary_id : {{ diary.id }},
+            $.post('/mine/edit_diary/{{ diary.id }}',{
                 title: title.trim(),
                 weather: $('input[name="weather"]:checked').val(),
                 type: $('#type').val(),
+                private : $('input[name="private"]:checked').val(),
+                diary_password: $('#diary_password').val(),
                 content: ue.getContent()
             }, function(data) {
                 if (data == 'ok') {
@@ -114,6 +120,17 @@
             </select>
         </div>
    </div>
+</div>
+
+<div class="am-g">
+    <label>隐私:</label>
+    完全公开：
+    <input type="radio" class="radio_item" checked="checked" name="private" value="0" />
+    仅自己可见：
+    <input type="radio" class="radio_item" name="private" value="1" />
+    密码可见：
+    <input type="radio" class="radio_item" name="private" value="2" /> &nbsp;
+    <input type="password" id="diary_password" name="diary_password">
 </div>
 
 <div class="am-g">

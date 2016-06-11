@@ -28,9 +28,10 @@ def find_diaries_count_by_type(user_id, type):
     return diaries.find({'user_id': int(user_id), 'delete_status': 0, 'type': type}).count()
 
 
-def insert_one_diary(diary_id, user_id, title, weather, type, date, content):
+def insert_one_diary(diary_id, user_id, title, weather, type, date, content, private):
     diaries.insert_one({"id": diary_id, "user_id": user_id, "title": title,
-                        "weather": weather, "type": type, "date": date, "content": content, "delete_status": 0})
+                        "weather": weather, "type": type, "date": date, "content": content, "private": private,
+                        "delete_status": 0})
 
 
 def find_diary_by_id(diary_id):
@@ -41,6 +42,6 @@ def delete_diary_by_id(diary_id):
     return diaries.update({'id': diary_id}, {'$set': {'delete_status': 1}})
 
 
-def update_diary_id(diary_id, title, weather, type, date, content):
+def update_diary_id(diary_id, title, weather, type, date, content, private):
     diaries.update({'id': diary_id}, {'$set': {'title': title, 'weather': weather, 'type': type, 'date': date,
-                                               'content': content}})
+                                               'content': content, 'private': private}})

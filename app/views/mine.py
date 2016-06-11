@@ -3,7 +3,7 @@
 import os
 from flask import Blueprint, request, session, render_template, redirect, url_for, json, make_response
 from werkzeug.utils import secure_filename
-from MongoDBDao import DiaryDao, IDDao
+from MongoDBDao import DiaryDao, IDDao, DiaryPasswordDao
 import sys, time
 import re
 from uploader import Uploader
@@ -29,20 +29,32 @@ def choose_by_type(type):
 @mine.route('/mine/view_diary/<diary_id>')
 def view_diary(diary_id):
     diary = DiaryDao.find_diary_by_id(int(diary_id))
-    return render_template('profile_detail.html', diary=diary, view_or_edit=1)
+
+    diary_password = ''
+    if diary['private']=='2':
+        diary_password_obj = DiaryPasswordDao.find_by_diary_id(diary['id'])
+        diary_password = diary_password_obj['diary_password']
+
+    return render_template('view_diary.html', diary=diary, view_or_edit=1, diary_password=diary_password)
 
 
 @mine.route('/mine/go_edit_diary/<diary_id>')
 def go_edit_diary(diary_id):
     diary = DiaryDao.find_diary_by_id(int(diary_id))
-    return render_template('view_diary.html', diary=diary, view_or_edit=2)
+
+    diary_password = ''
+    if diary['private'] == '2':
+        diary_password_obj = DiaryPasswordDao.find_by_diary_id(int(diary['id']))
+        diary_password = diary_password_obj['diary_password']
+
+    return render_template('view_diary.html', diary=diary, view_or_edit=2, diary_password=diary_password)
 
 
-@mine.route('/mine/edit_diary/<diary_id>')
+@mine.route('/mine/edit_diary/<diary_id>', methods=['post'])
 def edit_diary(diary_id):
     session_user_id = session['user_id']
     diary = DiaryDao.find_diary_by_id(int(diary_id))
-    owner_id = diary.user_id
+    owner_id = diary['user_id']
     if str(owner_id) != str(session_user_id):
         return 'error'
 
@@ -50,7 +62,13 @@ def edit_diary(diary_id):
     type = request.form['type']
     weather = request.form['weather']
     content = request.form['content']
-    DiaryDao.update_diary_id(diary_id, title, weather, type, diary.date, content)
+
+    private = request.form['private']
+    if private == '2':
+        diary_password = request.form['diary_password']
+        DiaryPasswordDao.insert_or_update(int(diary_id), diary_password)
+
+    DiaryDao.update_diary_id(int(diary_id), title, weather, type, diary['date'], content, private)
     return 'ok'
 
 
@@ -78,9 +96,17 @@ def save_diary():
     type = request.form['type']
     weather = request.form['weather']
     content = request.form['content']
+
     diary_id = IDDao.find_and_modify('diary')
     date = time.strftime('%Y年%m月%d日', time.localtime(time.time()))
-    DiaryDao.insert_one_diary(diary_id['id'], int(user_id), title, weather, type, date, content)
+
+    private = request.form['private']
+    if private == '2':
+        diary_password = request.form['diary_password']
+        DiaryPasswordDao.insert_or_update(diary_id['id'], diary_password)
+
+    DiaryDao.insert_one_diary(diary_id['id'], int(user_id), title, weather, type, date, content, private)
+
     return 'ok'
 
 

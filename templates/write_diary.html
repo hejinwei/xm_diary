@@ -28,6 +28,15 @@
             //更多其他参数，请参考ueditor.config.js中的配置项
         })
 
+        $(document).ready(function() {
+            $('.radio_item').change(function() {
+                var select_radio = $('input[name="private"]:checked').val();
+                if (select_radio != '2') {
+                    $('#diary_password').val('');
+                }
+            });
+        });
+
         function save_diary() {
             var ue = UE.getEditor('myEditor');
             <!--alert("ue:" + ue);-->
@@ -49,6 +58,8 @@
                 title: title.trim(),
                 weather: $('input[name="weather"]:checked').val(),
                 type: $('#type').val(),
+                private : $('input[name="private"]:checked').val(),
+                diary_password: $('#diary_password').val(),
                 content: ue.getContent()
             }, function(data) {
                 if (data == 'ok') {
@@ -89,7 +100,7 @@
 </div>
 
 <div class="am-g">
-    类型:
+    <label>类型:</label>
     <div class="am-u-sm-12 am-u-md-12">
         <div class="am-form-group">
             <select id="type" name="type" data-am-selected="{btnSize: 'sm'}">
@@ -99,6 +110,17 @@
             </select>
         </div>
    </div>
+</div>
+
+<div class="am-g">
+    <label>隐私:</label><br>
+    完全公开：
+    <input type="radio" class="radio_item" checked="checked" name="private" value="0" />
+    仅自己可见：
+    <input type="radio" class="radio_item" name="private" value="1" />
+    密码可见：
+    <input type="radio" class="radio_item" name="private" value="2" /> &nbsp;
+    <input type="password" id="diary_password" name="diary_password">
 </div>
 
 <div class="am-g">
