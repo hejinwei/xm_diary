@@ -7,18 +7,33 @@
 {% block js_files %}
 
 <script type="text/javascript">
+
+    $(function(){
+        $('#diary_type [value="{{ select_type }}"]').attr('selected', 'selected');
+    });
+
     function go_write_diary() {
-        window.location.href='/go_write_diary/' + {{ user_id }};
+        window.location.href='/mine/go_write_diary/' + {{ user_id }};
     }
 
     function go_edit_diary(diary_id) {
         alert('edit');
-        window.location.href='/go_edit_diary/' + diary_id;
+        window.location.href='/mine/go_edit_diary/' + diary_id;
     }
 
     function delete_diary(diary_id) {
         alert('delete');
-        window.location.href='/delete_diary/' + diary_id;
+        window.location.href='/mine/delete_diary/' + diary_id;
+    }
+
+    function select_type() {
+        var type = $('#diary_type').val();
+
+        if (type == '0') {
+            window.location.href='/mine/list';
+        } else {
+            window.location.href='/mine/choose_by_type/' + type;
+        }
     }
 
 </script>
@@ -45,9 +60,9 @@
     </div>
     <div class="am-u-sm-12 am-u-md-3">
         <div class="am-form-group">
-            <select data-am-selected="{btnSize: 'sm'}">
+            <select id="diary_type" data-am-selected="{btnSize: 'sm'}" onchange="select_type()">
                 <option value="0">所有类别</option>
-                <option value="1">舒服感情</option>
+                <option value="1">抒发感情</option>
                 <option value="2">吐槽</option>
                 <option value="3">秀恩爱</option>
             </select>
@@ -80,8 +95,28 @@
                 {% for diary in diaries %}
                 <tr>
                     <td><a href="/view_diary/{{ diary.id }}">{{ diary.title }}</a></td>
-                    <td>{{ diary.type }}</td>
-                    <td>{{ diary.weather }}</td>
+                    <td>
+                        {% if diary.type == '1' %}
+                            抒发感情
+                        {% elif diary.type=='2' %}
+                            吐槽
+                        {% elif diary.type=='3' %}
+                            秀恩爱
+                        {% else %}
+                            {{ diary.type }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if diary.weather == '1' %}
+                            晴
+                        {% elif diary.weather=='2' %}
+                            雨
+                        {% elif diary.weather=='3' %}
+                            阴天
+                        {% else %}
+                            {{ diary.weather }}
+                        {% endif %}
+                    </td>
                     <td class="am-hide-sm-only">{{ diary.date }}</td>
                     <td>
                         <div class="am-btn-toolbar">
@@ -102,7 +137,7 @@
                 {% endfor %}
                 </tbody>
             </table>
-            <div class="am-cf">
+            <!--<div class="am-cf">
                 共 {{ count }} 条记录
                 <div class="am-fr">
                     <ul class="am-pagination">
@@ -115,9 +150,9 @@
                         <li><a href="#">»</a></li>
                     </ul>
                 </div>
-            </div>
-            <hr/>
-            <p>注：.....</p>
+            </div>-->
+           <!-- <hr/>
+            <p>注：.....</p>-->
         </form>
     </div>
 </div>

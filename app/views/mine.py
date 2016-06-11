@@ -13,42 +13,59 @@ sys.setdefaultencoding('utf8')
 
 mine = Blueprint('mine', __name__, static_folder='../static')
 
-default_page_size = 15
+default_page_size = 1000
 
 UPLOAD_FOLDER = '/Users/jinweihe/Desktop/tmpFileUpload'
 
 
-@mine.route('/show_diary_list/<user_id>/<int:page_num>')
-def show_diary_list(user_id, page_num):
-    count = DiaryDao.find_diaries_count(user_id)
-    diaries = DiaryDao.find_diaries(user_id, page_num, default_page_size)
-    return render_template('mine.html', count=count, diaries=diaries, user_id=user_id)
+@mine.route('/mine/choose_by_type/<type>')
+def choose_by_type(type):
+    #count = DiaryDao.find_diaries_count_by_type(user_id, type)
+    user_id = session['user_id']
+    diaries = DiaryDao.find_diaries_by_type(user_id, type, 1, default_page_size)
+    return render_template('mine.html', diaries=diaries, user_id=user_id, select_type=type)
 
 
-@mine.route('/view_diary/<diary_id>')
+@mine.route('/mine/view_diary/<diary_id>')
 def view_diary(diary_id):
     diary = DiaryDao.find_diary_by_id(int(diary_id))
-    return render_template('profile_detail.html', diary=diary)
+    return render_template('profile_detail.html', diary=diary, view_or_edit=1)
 
 
-@mine.route('/go_edit_diary/<diary_id>')
+@mine.route('/mine/go_edit_diary/<diary_id>')
 def go_edit_diary(diary_id):
     diary = DiaryDao.find_diary_by_id(int(diary_id))
     return render_template('view_diary.html', diary=diary, view_or_edit=2)
 
 
-@mine.route('/go_write_diary/<user_id>')
+@mine.route('/mine/edit_diary/<diary_id>')
+def edit_diary(diary_id):
+    session_user_id = session['user_id']
+    diary = DiaryDao.find_diary_by_id(int(diary_id))
+    owner_id = diary.user_id
+    if str(owner_id) != str(session_user_id):
+        return 'error'
+
+    title = request.form['title']
+    type = request.form['type']
+    weather = request.form['weather']
+    content = request.form['content']
+    DiaryDao.update_diary_id(diary_id, title, weather, type, diary.date, content)
+    return 'ok'
+
+
+@mine.route('/mine/go_write_diary/<user_id>')
 def go_write_diary(user_id):
     return render_template('write_diary.html', user_id=user_id)
 
 
-@mine.route('/delete_diary/<diary_id>')
+@mine.route('/mine/delete_diary/<diary_id>')
 def delete_diary(diary_id):
     DiaryDao.delete_diary_by_id(diary_id)
     return None
 
 
-@mine.route('/save_diary', methods=['post'])
+@mine.route('/mine/save_diary', methods=['post'])
 def save_diary():
 
     ##验证用户
@@ -67,14 +84,12 @@ def save_diary():
     return 'ok'
 
 
-@mine.route('/mine')
+@mine.route('/mine/list')
 def mine_index():
-    return redirect(url_for('mine.show_diary_list', user_id=session['user_id'], page_num=1))
-
-
-@mine.route('/profile/<user_id>')
-def profile(user_id):
-    return render_template('profile.html', user_id=user_id)
+    user_id=session['user_id']
+    #count = DiaryDao.find_diaries_count(user_id)
+    diaries = DiaryDao.find_diaries(user_id, 1, default_page_size)
+    return render_template('mine.html', diaries=diaries, user_id=user_id, select_type='0')
 
 
 @mine.route('/upload', methods=['GET', 'POST'])
