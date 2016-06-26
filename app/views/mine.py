@@ -3,7 +3,7 @@
 import os
 from flask import Blueprint, request, session, render_template, redirect, url_for, json, make_response
 from werkzeug.utils import secure_filename
-from MongoDBDao import DiaryDao, IDDao, DiaryPasswordDao
+from MongoDBDao import DiaryDao, IDDao, DiaryPasswordDao, PersonalSignDao, DiaryStatisticDao
 import sys, time
 import re
 from uploader import Uploader
@@ -31,11 +31,12 @@ def view_diary(diary_id):
     diary = DiaryDao.find_diary_by_id(int(diary_id))
 
     diary_password = ''
-    if diary['private']=='2':
+    if diary['private'] == '2':
         diary_password_obj = DiaryPasswordDao.find_by_diary_id(diary['id'])
         diary_password = diary_password_obj['diary_password']
 
-    return render_template('view_diary.html', diary=diary, view_or_edit=1, diary_password=diary_password)
+    DiaryStatisticDao.insert_or_update_view_number(int(diary_id), session['user_id'])
+    return render_template('view_diary.html', user_id=session['user_id'], diary=diary, view_or_edit=1, diary_password=diary_password)
 
 
 @mine.route('/mine/go_edit_diary/<diary_id>')
@@ -47,7 +48,7 @@ def go_edit_diary(diary_id):
         diary_password_obj = DiaryPasswordDao.find_by_diary_id(int(diary['id']))
         diary_password = diary_password_obj['diary_password']
 
-    return render_template('view_diary.html', diary=diary, view_or_edit=2, diary_password=diary_password)
+    return render_template('view_diary.html', user_id=session['user_id'], diary=diary, view_or_edit=2, diary_password=diary_password)
 
 
 @mine.route('/mine/edit_diary/<diary_id>', methods=['post'])
@@ -81,6 +82,26 @@ def go_write_diary(user_id):
 def delete_diary(diary_id):
     DiaryDao.delete_diary_by_id(diary_id)
     return None
+
+
+@mine.route('/mine/personal_sign/edit')
+def personal_sign():
+    # 查询个性签名
+    user_id = session['user_id']
+    personal_sign_record = PersonalSignDao.find_personal_sign_by_user_id(user_id)
+    sign_content = ''
+    if personal_sign_record is not None:
+        sign_content = personal_sign_record['sign_content']
+
+    return render_template('personal_sign.html', sign_content=sign_content)
+
+
+@mine.route('/mine/personal_sign/save', methods=['post'])
+def save_personal_sign():
+    user_id = session['user_id']
+    sign_content = request.form['sign_content']
+    PersonalSignDao.save_or_update_personal_sign(user_id, sign_content)
+    return 'ok'
 
 
 @mine.route('/mine/save_diary', methods=['post'])

@@ -39,8 +39,8 @@ def do_login():
     # 把user_id存到session
     session['user_id'] = user['user_id']
 
-    # 跳转到首页
-    return redirect(url_for('mine.show_diary_list', user_id=user['user_id'], page_num=1))
+    # 跳转到我的首页
+    return redirect(url_for('mine.mine_index'))
 
 
 @login.route('/logout')
