@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block css_files %}
+<link rel="stylesheet"
+      href="{{ url_for('static', filename='assets/css/app.css') }}">
+{% endblock %}
+
+{% block js_files %}
+
+<script type="text/javascript">
+    function save_personal_sign() {
+        $.post('/mine/personal_sign/save',{
+                sign_content: $('#sign_content').val()
+            }, function(data) {
+                if (data == 'ok') {
+                    window.location.href='/mine/list';
+                } else {
+                    alert(data);
+                }
+            });
+    }
+
+</script>
+
+{% endblock %}
+
+{% block body %}
+<div class="am-cf am-padding">
+    <div class="am-fl am-cf"><strong class="am-text-primary am-text-lg">我的</strong> /
+        <small>个性签名</small>
+    </div>
+</div>
+
+<div class="am-g">
+    <div class="am-u-sm-12 am-u-md-12">
+        <div class="am-form-group">
+            <label for="sign_content">签名内容:</label>
+            <textarea class="" rows="5" id="sign_content"></textarea>
+        </div>
+    </div>
+
+    <p><button onclick="save_personal_sign()" type="button" class="am-btn am-btn-primary">提交</button></p>
+
+</div>
+
+
+
+{% endblock %}
